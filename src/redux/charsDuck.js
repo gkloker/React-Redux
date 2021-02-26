@@ -1,10 +1,10 @@
+import axios from 'axios';
 import {
   GET_CHARACTERS,
   GET_CHARACTERS_SUCCESS,
   GET_CHARACTERS_ERROR,
   REMOVE_CHARACTER,
 } from '../types';
-import axios from 'axios';
 // require('dotenv').config({ path: '.env' });
 
 // Constants
