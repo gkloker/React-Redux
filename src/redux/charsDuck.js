@@ -4,14 +4,17 @@ import {
   GET_CHARACTERS_SUCCESS,
   GET_CHARACTERS_ERROR,
   REMOVE_CHARACTER,
+  ADD_FAVORITES
 } from '../types';
+import { updateDB } from '../config/firebase';
 // require('dotenv').config({ path: '.env' });
 
 // Constants
 let initialData = {
   fetching: false,
   array: [],
-  current: {}
+  current: {},
+  favorites: []
 }
 let URL = "https://rickandmortyapi.com/api/character";
 
@@ -39,6 +42,11 @@ export default function reducer(state = initialData, action) {
       return {
         ...state,
         array: action.payload
+      }
+    case ADD_FAVORITES:
+      return {
+        ...state,
+        ...action.payload
       }
     default:
       return state
@@ -71,5 +79,21 @@ export let removeCharacterAction = () => (dispatch, getState) => {
   dispatch({
     type: REMOVE_CHARACTER,
     payload: [...array]
+  });
+}
+
+export let addToFavoritesAction = () => (dispatch, getState) => {
+  let {array, favorites} = getState().characters;
+  let { uid } = getState().user
+  let char = array.shift();
+  favorites.push(char);
+  updateDB(favorites, uid);
+
+  dispatch({
+    type: ADD_FAVORITES,
+    payload: {
+      array: [...array],
+      favorites: [...favorites]
+    }
   });
 }

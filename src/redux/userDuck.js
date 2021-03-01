@@ -1,8 +1,9 @@
-import { loginWithGoogle } from '../config/firebase';
+import { loginWithGoogle, logoutGoolge } from '../config/firebase';
 import {
   LOGIN,
   LOGIN_SUCCESS,
-  LOGIN_ERROR
+  LOGIN_ERROR,
+  LOG_OUT
 } from '../types/index';
 
 // Constants
@@ -31,6 +32,10 @@ export default function reducer(state = initialData, action) {
         ...state,
         fetching: false,
         error: action.payload
+      }
+    case LOG_OUT:
+      return {
+        ...initialData
       }
     default:
       return state
@@ -61,6 +66,14 @@ export let doGoogleLoginAction = () => (dispatch, getState) => {
         payload: e.message
       });
     });
+}
+
+export let logOutAction = () => (dispatch, getState) => {
+  logoutGoolge();
+  dispatch({
+    type: LOG_OUT
+  });
+  localStorage.removeItem('storage');
 }
 
 export let restoreSessionAction = () => dispatch => {

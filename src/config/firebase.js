@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -16,9 +17,19 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // firebase.analytics();
 
+let db = firebase.firestore().collection('favs');
+
+export function logoutGoolge() {
+  firebase.auth().signOut();
+}
+
 export function loginWithGoogle() {
   let provider = new firebase.auth.GoogleAuthProvider();
 
   return firebase.auth().signInWithPopup(provider)
     .then(snap => snap.user);
+}
+
+export function updateDB(array, uid) {
+  db.doc(uid).set({array})
 }
