@@ -8,7 +8,7 @@ function PrivateRoute({path, component, ...rest}) {
   let storage = localStorage.getItem('storage');
   storage = JSON.parse(storage);
   if (storage && storage.user) {
-    return <Route path={path} componen={component} {...rest} />
+    return <Route path={path} component={component} {...rest} />
   } else {
     return <Redirect to="/login" {...rest} />
   }
@@ -17,8 +17,8 @@ function PrivateRoute({path, component, ...rest}) {
 export default function Routes() {
   return (
     <Switch>
-      <Route exact path="/" component={Home} />
-      <Route path="/favs" component={FavPage} />
+      <PrivateRoute exact path="/" component={Home} />
+      <PrivateRoute path="/favs" component={FavPage} />
       <Route path="/login" component={LoginPage} />
     </Switch>
   )

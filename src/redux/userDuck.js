@@ -5,6 +5,7 @@ import {
   LOGIN_ERROR,
   LOG_OUT
 } from '../types/index';
+import { retreiveFavorites } from './charsDuck';
 
 // Constants
 let initialData = {
@@ -59,6 +60,7 @@ export let doGoogleLoginAction = () => (dispatch, getState) => {
         }
       });
       saveLocalStorage(getState());
+      retreiveFavorites()(dispatch, getState);
     })
     .catch(e => {
       dispatch({

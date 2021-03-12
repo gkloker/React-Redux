@@ -1,13 +1,19 @@
 import axios from 'axios';
+// import env from "react-dotenv";
+import {
+  updateDB,
+  getFavorites
+} from '../config/firebase';
 import {
   GET_CHARACTERS,
   GET_CHARACTERS_SUCCESS,
   GET_CHARACTERS_ERROR,
   REMOVE_CHARACTER,
-  ADD_FAVORITES
+  ADD_FAVORITES,
+  GET_FAVORITES,
+  GET_FAVORITES_SUCCESS,
+  GET_FAVORITES_ERROR,
 } from '../types';
-import { updateDB } from '../config/firebase';
-// require('dotenv').config({ path: '.env' });
 
 // Constants
 let initialData = {
@@ -17,6 +23,8 @@ let initialData = {
   favorites: []
 }
 let URL = "https://rickandmortyapi.com/api/character";
+
+// console.warn("test", env.URL);
 
 // Reducer
 export default function reducer(state = initialData, action) {
@@ -47,6 +55,23 @@ export default function reducer(state = initialData, action) {
       return {
         ...state,
         ...action.payload
+      }
+    case GET_FAVORITES:
+      return {
+        ...state,
+        fetching: true
+      }
+    case GET_FAVORITES_SUCCESS:
+      return {
+        ...state,
+        favorites: action.payload,
+        fetching: false
+      }
+    case GET_FAVORITES_ERROR:
+      return {
+        ...state,
+        fetching: false,
+        error: action.payload
       }
     default:
       return state
@@ -96,4 +121,26 @@ export let addToFavoritesAction = () => (dispatch, getState) => {
       favorites: [...favorites]
     }
   });
+}
+
+export let retreiveFavorites = () => (dispatch, getState) => {
+  dispatch({
+    type: GET_FAVORITES
+  });
+  let {uid} = getState().user
+
+  return getFavorites(uid)
+    .then(array => {
+      dispatch({
+        type: GET_FAVORITES_SUCCESS,
+        payload: [...array]
+      })
+    })
+    .catch(e => {
+      console.log(e);
+      dispatch({
+        type: GET_FAVORITES_ERROR,
+        payload: e.message
+      })
+    })
 }

@@ -7,6 +7,7 @@ import 'firebase/firestore';
 var firebaseConfig = {
   apiKey: "AIzaSyDan8OBISGedufjuODG7IS6sG9Q72V0Llc",
   authDomain: "curso-redux-with-hooks.firebaseapp.com",
+  databaseURL: "https://curso-redux-with-hooks-default-rtdb.firebaseio.com",
   projectId: "curso-redux-with-hooks",
   storageBucket: "curso-redux-with-hooks.appspot.com",
   messagingSenderId: "669044233066",
@@ -31,5 +32,12 @@ export function loginWithGoogle() {
 }
 
 export function updateDB(array, uid) {
-  db.doc(uid).set({array})
+  return db.doc(uid).set({array});
+}
+
+export function getFavorites(uid) {
+  return db.doc(uid).get()
+    .then(snap => {
+      return snap.data().array;
+    })
 }
