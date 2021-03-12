@@ -3,9 +3,11 @@ import {
   LOGIN,
   LOGIN_SUCCESS,
   LOGIN_ERROR,
-  LOG_OUT
+  LOG_OUT,
 } from '../types/index';
 import { retreiveFavorites } from './charsDuck';
+import { saveLocalStorage, getLocalStorage, removeLocalStorage } from "../common/helper";
+
 
 // Constants
 let initialData = {
@@ -75,21 +77,15 @@ export let logOutAction = () => (dispatch, getState) => {
   dispatch({
     type: LOG_OUT
   });
-  localStorage.removeItem('storage');
+  removeLocalStorage('storage');
 }
 
 export let restoreSessionAction = () => dispatch => {
-  let storage = localStorage.getItem("storage");
-  storage = JSON.parse(storage);
+  let storage = JSON.parse(getLocalStorage('storage'));
   if (storage && storage.user) {
     dispatch({
       type: LOGIN_SUCCESS,
       payload: storage.user
-    })
+    });
   }
-}
-
-// Aux function
-function saveLocalStorage(storage) {
-  localStorage.storage = JSON.stringify(storage);
 }

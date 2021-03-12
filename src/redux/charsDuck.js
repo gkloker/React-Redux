@@ -14,6 +14,7 @@ import {
   GET_FAVORITES_SUCCESS,
   GET_FAVORITES_ERROR,
 } from '../types';
+import {getLocalStorage, saveLocalStorage} from "../common/helper";
 
 // Constants
 let initialData = {
@@ -113,7 +114,6 @@ export let addToFavoritesAction = () => (dispatch, getState) => {
   let char = array.shift();
   favorites.push(char);
   updateDB(favorites, uid);
-
   dispatch({
     type: ADD_FAVORITES,
     payload: {
@@ -135,6 +135,7 @@ export let retreiveFavorites = () => (dispatch, getState) => {
         type: GET_FAVORITES_SUCCESS,
         payload: [...array]
       })
+      saveLocalStorage(getState());
     })
     .catch(e => {
       console.log(e);
