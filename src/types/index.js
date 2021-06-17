@@ -13,3 +13,5 @@ export let GET_FAVORITES_ERROR = "GET_FAVORITES_ERROR";
 export let LOGIN = "LOGIN";
 export let LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export let LOGIN_ERROR = "LOGIN_ERROR";
+
+export let UPDATE_PAGE = "UPDATE_PAGE";

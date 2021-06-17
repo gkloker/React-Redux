@@ -6,8 +6,11 @@ import {
   LOG_OUT,
 } from '../types/index';
 import { retreiveFavorites } from './charsDuck';
-import { saveLocalStorage, getLocalStorage, removeLocalStorage } from "../common/helper";
-
+import {
+  saveLocalStorage,
+  getLocalStorage,
+  removeLocalStorage
+} from "../common/helper";
 
 // Constants
 let initialData = {
@@ -50,6 +53,7 @@ export let doGoogleLoginAction = () => (dispatch, getState) => {
   dispatch({
     type: LOGIN
   })
+
   return loginWithGoogle()
     .then(user => {
       dispatch({
@@ -62,6 +66,7 @@ export let doGoogleLoginAction = () => (dispatch, getState) => {
         }
       });
       saveLocalStorage(getState());
+
       retreiveFavorites()(dispatch, getState);
     })
     .catch(e => {
@@ -74,6 +79,7 @@ export let doGoogleLoginAction = () => (dispatch, getState) => {
 
 export let logOutAction = () => (dispatch, getState) => {
   logoutGoolge();
+
   dispatch({
     type: LOG_OUT
   });
@@ -82,6 +88,7 @@ export let logOutAction = () => (dispatch, getState) => {
 
 export let restoreSessionAction = () => dispatch => {
   let storage = JSON.parse(getLocalStorage('storage'));
+
   if (storage && storage.user) {
     dispatch({
       type: LOGIN_SUCCESS,

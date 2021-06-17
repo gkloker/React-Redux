@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import env from "react-dotenv";
+import ApolloClient, {gql} from 'apollo-boost';
 import {
   updateDB,
   getFavorites
@@ -13,6 +13,7 @@ import {
   GET_FAVORITES,
   GET_FAVORITES_SUCCESS,
   GET_FAVORITES_ERROR,
+  UPDATE_PAGE,
 } from '../types';
 import {getLocalStorage, saveLocalStorage} from "../common/helper";
 
@@ -21,11 +22,13 @@ let initialData = {
   fetching: false,
   array: [],
   current: {},
-  favorites: []
+  favorites: [],
+  nextPage: 1
 }
-let URL = "https://rickandmortyapi.com/api/character";
 
-// console.warn("test", env.URL);
+let client = new ApolloClient({
+  uri: "https://rickandmortyapi.com/graphql"
+})
 
 // Reducer
 export default function reducer(state = initialData, action) {
@@ -74,6 +77,11 @@ export default function reducer(state = initialData, action) {
         fetching: false,
         error: action.payload
       }
+    case UPDATE_PAGE:
+      return {
+        ...state,
+        nextPage: action.payload
+      }
     default:
       return state
   }
@@ -81,27 +89,63 @@ export default function reducer(state = initialData, action) {
 
 // Action (action creator, thunk)
 export let getCharactersAction = () => (dispatch, getState) => {
+  let query = gql`
+    query ($page:Int) {
+      characters (page:$page) {
+        info {
+          pages
+          next
+          prev
+        }
+        results {
+          name
+          image
+        }
+      }
+    }
+  `;
+
   dispatch({
     type: GET_CHARACTERS
   });
-  return axios.get(URL)
-    .then(res => {
-      dispatch({
-        type: GET_CHARACTERS_SUCCESS,
-        payload: res.data.results
-      })
-    })
-    .catch(error => {
+
+  let {nextPage} = getState().characters;
+
+  return client.query({
+    query,
+    variables:{page: nextPage}
+  })
+  .then(({data, error}) => {
+    if (error) {
       dispatch({
         type: GET_CHARACTERS_ERROR,
-        payload: error.request.response
+        payload: error
       });
+
+      return;
+    }
+
+    dispatch({
+      type: GET_CHARACTERS_SUCCESS,
+      payload: data.characters.results
     });
+
+    dispatch({
+      type: UPDATE_PAGE,
+      payload: data.characters.info.next ? data.characters.info.next : 1
+    });
+  });
 }
 
 export let removeCharacterAction = () => (dispatch, getState) => {
   let { array } = getState().characters;
   array.shift();
+
+  if (!array.length) {
+    getCharactersAction()(dispatch, getState);
+    return;
+  }
+
   dispatch({
     type: REMOVE_CHARACTER,
     payload: [...array]
@@ -112,8 +156,11 @@ export let addToFavoritesAction = () => (dispatch, getState) => {
   let {array, favorites} = getState().characters;
   let { uid } = getState().user
   let char = array.shift();
+
   favorites.push(char);
+
   updateDB(favorites, uid);
+
   dispatch({
     type: ADD_FAVORITES,
     payload: {
@@ -127,6 +174,7 @@ export let retreiveFavorites = () => (dispatch, getState) => {
   dispatch({
     type: GET_FAVORITES
   });
+
   let {uid} = getState().user
 
   return getFavorites(uid)
